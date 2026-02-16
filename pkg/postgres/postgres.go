@@ -10,7 +10,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-var db *pgxpool.Pool
+var Db *pgxpool.Pool
 
 func NewPostgresConn(ctx context.Context, conn *configs.PostgresConfigs) {
 	if conn == nil {
@@ -38,12 +38,12 @@ func NewPostgresConn(ctx context.Context, conn *configs.PostgresConfigs) {
 	config.ConnConfig.DefaultQueryExecMode = pgx.QueryExecModeSimpleProtocol
 	config.ConnConfig.StatementCacheCapacity = 0
 
-	db, err = pgxpool.NewWithConfig(ctx, config)
+	Db, err = pgxpool.NewWithConfig(ctx, config)
 	if err != nil {
 		log.Fatalf("unable to create connection pool: %v", err)
 	}
 
-	if err := db.Ping(ctx); err != nil {
+	if err := Db.Ping(ctx); err != nil {
 		log.Fatalf("unable to ping database: %v", err)
 	}
 

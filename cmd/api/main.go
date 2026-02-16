@@ -7,7 +7,10 @@ import (
 
 func main() {
 	configs.LoadConfigs()
-	route := application.NewApplication()
+	app := application.NewApplication()
 
-	route.StartServer(":8080")
+	defer app.Logger.Sync()
+
+	app.Routes.StartServer(":8080")
+	app.Logger.Info("INICIALIZA LOGO!")
 }

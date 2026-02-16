@@ -31,17 +31,24 @@ func LoadConfigs() {
 		log.Println("Warning: .env file not found, using system environment variables")
 	}
 
+	log.Println(".env inicializate")
 	initializeApp()
+	initializeDb()
 }
 
 func initializeApp() {
 	App = &AppConfigs{
 		Port: os.Getenv("PORT"),
+		Env:  os.Getenv("ENV"),
 	}
 }
 
 func initializeDb() {
 	DbConn = &PostgresConfigs{
-		Host: os.Getenv("DB_HOST"),
+		Host:     os.Getenv("DB_HOST"),
+		Port:     os.Getenv("DB_PORT"),
+		User:     os.Getenv("DB_USER"),
+		Password: os.Getenv("DB_PASSWORD"),
+		DbName:   os.Getenv("DB_NAME"),
 	}
 }
