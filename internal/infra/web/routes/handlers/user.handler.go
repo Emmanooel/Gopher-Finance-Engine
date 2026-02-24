@@ -1,4 +1,4 @@
-package routes
+package handlers
 
 import (
 	"context"
@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (s *Server) CreateUser(c *gin.Context) {
+func (s *Handlers) CreateUser(c *gin.Context) {
 	ctx := c.Request.Context()
 
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
@@ -32,7 +32,7 @@ func (s *Server) CreateUser(c *gin.Context) {
 	c.JSON(202, gin.H{"message": "omg deu certo!"})
 }
 
-func (s *Server) Login(c *gin.Context) {
+func (s *Handlers) Login(c *gin.Context) {
 	ctx := c.Request.Context()
 	var body *entity.UserLogin
 
@@ -53,7 +53,7 @@ func (s *Server) Login(c *gin.Context) {
 	})
 }
 
-func (s *Server) GetUsers(c *gin.Context) {
+func (s *Handlers) GetUsers(c *gin.Context) {
 	ctx := c.Request.Context()
 	p := c.Query("page")
 

@@ -1,8 +1,8 @@
-package routes
+package handlers
 
 import "github.com/gin-gonic/gin"
 
-func (s *Server) GetPositionByUserId(c *gin.Context) {
+func (s *Handlers) GetPositionByUserId(c *gin.Context) {
 	ctx := c.Request.Context()
 	id := c.Param("id")
 

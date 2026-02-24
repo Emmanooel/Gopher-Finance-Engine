@@ -1,26 +1,28 @@
 package routes
 
 import (
+	"gopher-finance-engine/internal/infra/web/routes/handlers"
+
 	"github.com/gin-gonic/gin"
 )
 
-func Routes(router *gin.Engine, server *Server) *gin.Engine {
+func Routes(router *gin.Engine, h handlers.Handlers) *gin.Engine {
 	healthGroup := router.Group("/health")
 	{
-		healthGroup.GET("/health", server.HealthCheck)
+		healthGroup.GET("/health", h.HealthCheck)
 	}
 
 	userGroup := router.Group("/user")
 	{
-		userGroup.POST("/create", server.CreateUser)
-		userGroup.POST("/login", server.Login)
+		userGroup.POST("/create", h.CreateUser)
+		userGroup.POST("/login", h.Login)
 
 	}
 
 	appsAuth := router.Group("/v1")
 	{
-		appsAuth.POST("/orders", server.CreateOrders)
-		appsAuth.GET("/portfolio/:id", server.GetPositionByUserId)
+		appsAuth.POST("/orders", h.CreateOrders)
+		appsAuth.GET("/portfolio/:id", h.GetPositionByUserId)
 	}
 	return router
 }

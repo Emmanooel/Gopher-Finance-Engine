@@ -2,15 +2,14 @@ package routes
 
 import (
 	"gopher-finance-engine/internal/domain/application/usecases"
+	"gopher-finance-engine/internal/infra/web/routes/handlers"
 
 	"github.com/gin-gonic/gin"
 )
 
 type Server struct {
-	Router          *gin.Engine
-	UserUsecase     usecases.UserUsecasesI
-	PositionUsecase usecases.PositionUsecasesI
-	OrderUsecase    usecases.OrdersUsecaseI
+	Router  *gin.Engine
+	Handler *handlers.Handlers
 }
 
 func NewServer(
@@ -20,14 +19,14 @@ func NewServer(
 ) *Server {
 	engine := gin.Default()
 
+	handlers := handlers.NewHandlers(userUsecase, positionUsecase, orderUsecase)
+
 	server := &Server{
-		Router:          engine,
-		UserUsecase:     userUsecase,
-		PositionUsecase: positionUsecase,
-		OrderUsecase:    orderUsecase,
+		Router:  engine,
+		Handler: handlers,
 	}
 
-	server.Router = Routes(engine, server)
+	server.Router = Routes(engine, *server.Handler)
 	return server
 
 }

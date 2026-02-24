@@ -1,4 +1,4 @@
-package routes
+package handlers
 
 import (
 	"gopher-finance-engine/internal/domain/entity"
@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (s *Server) CreateOrders(c *gin.Context) {
+func (s *Handlers) CreateOrders(c *gin.Context) {
 	ctx := c.Request.Context()
 	var body *entity.Order
 
