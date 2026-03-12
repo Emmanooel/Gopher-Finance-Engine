@@ -9,6 +9,7 @@ import (
 	"gopher-finance-engine/internal/infra/repository"
 	"gopher-finance-engine/internal/infra/web/routes"
 	"gopher-finance-engine/pkg/postgres"
+	"gopher-finance-engine/worker"
 
 	"go.uber.org/zap"
 )
@@ -49,8 +50,11 @@ func newUsecases(app *Application) Usecases {
 	authService := service.NewAuthService()
 
 	userUsecase := usecases.NewUsersUsecase(app.Logger, userRepository, authService)
-	positionUsecase := usecases.NewPositionUsecase(app.Logger, positionRepository)
-	orderUsecase := usecases.NewOrdersUsecase(app.Logger, orderRepository)
+	positionUsecase := usecases.NewPositionUsecase(app.Logger, positionRepository, orderRepository)
+
+	worker := worker.NewWorkerSaveNewPosition(app.Logger, positionUsecase)
+
+	orderUsecase := usecases.NewOrdersUsecase(app.Logger, orderRepository, positionUsecase, worker)
 
 	return Usecases{
 		UserUsecase:      userUsecase,

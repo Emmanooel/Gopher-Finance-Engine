@@ -6,5 +6,6 @@ import (
 )
 
 type PositionsRepositoryI interface {
-	GetAllPositions(ctx context.Context, id string) ([]*entity.Positions, error)
+	GetPositionByUserId(ctx context.Context, userId string) ([]*entity.Positions, error)
+	SaveNewPosition(ctx context.Context, pos *entity.Positions) error
 }

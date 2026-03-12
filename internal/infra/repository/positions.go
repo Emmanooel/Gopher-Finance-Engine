@@ -7,7 +7,12 @@ import (
 	"gopher-finance-engine/internal/domain/infra/repository"
 	"gopher-finance-engine/pkg/postgres"
 
+	"github.com/jackc/pgx/v5"
 	"go.uber.org/zap"
+)
+
+var (
+	ErrUserNotPosition = errors.New("user not have position activate in wallet")
 )
 
 type PositionRepository struct {
@@ -22,40 +27,81 @@ func NewPositionRepository(
 	}
 }
 
-func (p *PositionRepository) GetAllPositions(ctx context.Context, id string) ([]*entity.Positions, error) {
+func (p *PositionRepository) SaveNewPosition(ctx context.Context, pos *entity.Positions) error {
+	db := postgres.Db
+
+	const query = `INSERT INTO positions (id, user_id, symbol, total_amount, average_price, updated_at)
+					VALUES ($1, $2, $3, $4, $5, $6)
+
+					ON CONFLICT (user_id, symbol)
+					DO UPDATE
+					SET total_amount = positions.total_amount + EXCLUDED.total_amount,
+						average_price =
+						(
+							(positions.average_price * positions.total_amount) +
+							(EXCLUDED.average_price * EXCLUDED.total_amount)
+						)
+						/
+						NULLIF(positions.total_amount + EXCLUDED.total_amount, 0),
+						updated_at = EXCLUDED.updated_at
+	`
+
+	_, err := db.Exec(
+		ctx,
+		query,
+		pos.Id,
+		pos.UserId,
+		pos.Symbol,
+		pos.TotalAmount,
+		pos.AveragePrice,
+		pos.UpdatedAt,
+	)
+
+	if err != nil {
+		p.logger.Error("error save new position, error:" + err.Error())
+		return err
+	}
+
+	return nil
+
+}
+
+func (p *PositionRepository) GetPositionByUserId(ctx context.Context, userId string) ([]*entity.Positions, error) {
 	db := postgres.Db
 
 	if db == nil {
-		p.logger.Error("conn database is null")
-		return nil, errors.New("conn database is null")
+		p.logger.Error("database is null")
+		return nil, errors.New("database is null")
 	}
+
 	const query = `SELECT * FROM positions
-		WHERE id = $1
-		ORDER BY updated_at DESC
-	`
+	WHERE user_id = $1`
 
-	row, err := db.Query(ctx, query, id)
+	rows, err := db.Query(ctx, query, userId)
 
-	var positions []*entity.Positions
-	var o *entity.Positions
+	if err == pgx.ErrNoRows {
+		p.logger.Info("user not have position")
+		return nil, ErrUserNotPosition
+	}
 
-	for row.Next() {
-		err = row.Scan(
-			&o.Id,
-			&o.UserId,
-			&o.Symbol,
-			&o.TotalAmount,
-			&o.AveragePrice,
-			&o.UpdatedAt,
+	var output []*entity.Positions
+	var pp *entity.Positions
+	for rows.Next() {
+		err = rows.Scan(
+			&pp.Id,
+			&pp.UserId,
+			&pp.Symbol,
+			&pp.TotalAmount,
+			&pp.AveragePrice,
+			pp.UpdatedAt,
 		)
 
 		if err != nil {
-			p.logger.Error("error unmarshal results database")
-			return nil, errors.New("error unmarshal results")
+			p.logger.Error("errors at unsmarshal return database:" + err.Error())
+			return nil, err
 		}
-
-		positions = append(positions, o)
+		output = append(output, pp)
 	}
 
-	return positions, nil
+	return output, nil
 }
