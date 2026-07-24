@@ -72,3 +72,39 @@ func (u *UserRepository) FindByEmail(ctx context.Context, email string) (*entity
 
 	return &us, nil
 }
+
+func (u *UserRepository) GetAllUsers(ctx context.Context) ([]*entity.Users, error) {
+	const query = `
+		SELECT * FROM users 
+	`
+
+	var users []*entity.Users
+
+	rows, err := postgres.Db.Query(ctx, query)
+
+	err = rows.Err()
+
+	if err != nil {
+		u.logger.Error("error on get all users", zap.Error(err))
+		return nil, err
+	}
+
+	for rows.Next() {
+		var user *entity.Users
+		err := rows.Scan(
+			&user.Id,
+			&user.Name,
+			&user.Email,
+			&user.Password,
+			&user.Role,
+			&user.CreatedAt,
+		)
+		if err != nil {
+			u.logger.Error("error on scan user", zap.Error(err))
+			return nil, err
+		}
+		users = append(users, user)
+	}
+
+	return users, nil
+}

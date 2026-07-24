@@ -21,8 +21,8 @@ type Meta struct {
 }
 
 type UsersResponse struct {
-	Data []Users `json:"data"`
-	Meta Meta    `json:"meta"`
+	Data []*Users `json:"data"`
+	Meta Meta     `json:"meta"`
 }
 
 type UserLogin struct {

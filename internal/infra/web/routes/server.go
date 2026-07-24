@@ -1,7 +1,9 @@
 package routes
 
 import (
-	"gopher-finance-engine/internal/domain/application/usecases"
+	"gopher-finance-engine/internal/application/usecases/orders"
+	"gopher-finance-engine/internal/application/usecases/positions"
+	"gopher-finance-engine/internal/application/usecases/users"
 	"gopher-finance-engine/internal/infra/web/routes/handlers"
 
 	"github.com/gin-gonic/gin"
@@ -13,9 +15,9 @@ type Server struct {
 }
 
 func NewServer(
-	userUsecase usecases.UserUsecasesI,
-	positionUsecase usecases.PositionUsecasesI,
-	orderUsecase usecases.OrdersUsecaseI,
+	userUsecase users.UserUsecasesI,
+	positionUsecase positions.PositionUsecasesI,
+	orderUsecase orders.OrdersUsecaseI,
 ) *Server {
 	engine := gin.Default()
 

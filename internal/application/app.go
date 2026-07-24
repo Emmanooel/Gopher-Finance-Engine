@@ -3,13 +3,13 @@ package application
 import (
 	"context"
 	"gopher-finance-engine/configs"
-	"gopher-finance-engine/internal/application/service"
-	"gopher-finance-engine/internal/application/usecases"
-	domainUsecase "gopher-finance-engine/internal/domain/application/usecases"
+	"gopher-finance-engine/internal/application/usecases/orders"
+	"gopher-finance-engine/internal/application/usecases/positions"
+	"gopher-finance-engine/internal/application/usecases/users"
+	"gopher-finance-engine/internal/infra/auth"
 	"gopher-finance-engine/internal/infra/repository"
 	"gopher-finance-engine/internal/infra/web/routes"
 	"gopher-finance-engine/pkg/postgres"
-	"gopher-finance-engine/worker"
 
 	"go.uber.org/zap"
 )
@@ -21,9 +21,9 @@ type Application struct {
 }
 
 type Usecases struct {
-	UserUsecase      domainUsecase.UserUsecasesI
-	PositionsUsecase domainUsecase.PositionUsecasesI
-	OrderUsecase     domainUsecase.OrdersUsecaseI
+	UserUsecase      users.UserUsecasesI
+	PositionsUsecase positions.PositionUsecasesI
+	OrderUsecase     orders.OrdersUsecaseI
 }
 
 func NewApplication() *Application {
@@ -47,14 +47,12 @@ func newUsecases(app *Application) Usecases {
 	positionRepository := repository.NewPositionRepository(app.Logger)
 	orderRepository := repository.NewOrdersRepository(app.Logger)
 
-	authService := service.NewAuthService()
+	authService := auth.NewAuthService()
 
-	userUsecase := usecases.NewUsersUsecase(app.Logger, userRepository, authService)
-	positionUsecase := usecases.NewPositionUsecase(app.Logger, positionRepository, orderRepository)
+	userUsecase := users.NewUsersUsecase(app.Logger, userRepository, authService)
+	positionUsecase := positions.NewPositionUsecase(app.Logger, positionRepository, orderRepository)
 
-	worker := worker.NewWorkerSaveNewPosition(app.Logger, positionUsecase)
-
-	orderUsecase := usecases.NewOrdersUsecase(app.Logger, orderRepository, positionUsecase, worker)
+	orderUsecase := orders.NewOrdersUsecase(app.Logger, orderRepository, positionUsecase)
 
 	return Usecases{
 		UserUsecase:      userUsecase,

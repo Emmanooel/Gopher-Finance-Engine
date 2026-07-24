@@ -1,17 +1,21 @@
 package handlers
 
-import "gopher-finance-engine/internal/domain/application/usecases"
+import (
+	"gopher-finance-engine/internal/application/usecases/orders"
+	"gopher-finance-engine/internal/application/usecases/positions"
+	"gopher-finance-engine/internal/application/usecases/users"
+)
 
 type Handlers struct {
-	UserUsecase     usecases.UserUsecasesI
-	PositionUsecase usecases.PositionUsecasesI
-	OrderUsecase    usecases.OrdersUsecaseI
+	UserUsecase     users.UserUsecasesI
+	PositionUsecase positions.PositionUsecasesI
+	OrderUsecase    orders.OrdersUsecaseI
 }
 
 func NewHandlers(
-	userUsecase usecases.UserUsecasesI,
-	positionUsecase usecases.PositionUsecasesI,
-	orderUsecase usecases.OrdersUsecaseI,
+	userUsecase users.UserUsecasesI,
+	positionUsecase positions.PositionUsecasesI,
+	orderUsecase orders.OrdersUsecaseI,
 ) *Handlers {
 	return &Handlers{
 		UserUsecase:     userUsecase,

@@ -8,4 +8,5 @@ import (
 type UsersRepositoryI interface {
 	CreateUser(ctx context.Context, users entity.Users) error
 	FindByEmail(ctx context.Context, email string) (*entity.Users, error)
+	GetAllUsers(ctx context.Context) ([]*entity.Users, error)
 }
