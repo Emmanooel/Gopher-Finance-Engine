@@ -1,0 +1,22 @@
+# ORDER-001 - Criar ordem
+
+## Objetivo
+
+Permitir que um usuário registre uma ordem de compra ou venda.
+
+---
+
+## Critérios de aceite
+
+- [ ] Informar ativo.
+- [ ] Informar quantidade.
+- [ ] Informar preço.
+- [ ] Informar tipo da ordem.
+- [ ] Associar a ordem ao usuário.
+- [ ] Criar a ordem com status PENDING.
+
+---
+
+## Status
+
+Backlog
