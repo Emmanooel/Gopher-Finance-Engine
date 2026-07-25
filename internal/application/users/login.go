@@ -2,7 +2,7 @@ package users
 
 import (
 	"context"
-	"gopher-finance-engine/internal/application/usecases"
+	"gopher-finance-engine/internal/application/utils"
 	"gopher-finance-engine/internal/domain/entity"
 
 	"go.uber.org/zap"
@@ -16,7 +16,7 @@ func (u *UsersUsecase) Login(ctx context.Context, body entity.UserLogin) (string
 		return "", err
 	}
 
-	match := usecases.CheckPasswordHash(body.Password, user.Password)
+	match := utils.CheckPasswordHash(body.Password, user.Password)
 
 	if !match {
 		return "", err

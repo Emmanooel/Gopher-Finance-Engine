@@ -1,4 +1,4 @@
-package repository
+package orders_repository
 
 import (
 	"context"
@@ -64,17 +64,21 @@ func (o *OrdersRepository) GetOrdersInPendingByUserId(ctx context.Context, userI
 
 	const query = `SELECT * FROM orders
 		WHERE user_id = $1 AND status = 'PENDING'
-		LIMIT 100
 	`
-	rows, err := db.Query(ctx, query)
+	rows, err := db.Query(ctx, query, userId)
 
-	if err == pgx.ErrNoRows {
-		o.logger.Error("none rows as returned")
+	if err != nil {
+		if err == pgx.ErrNoRows {
+			o.logger.Error("none rows as returned")
+			return nil, err
+		}
+
+		o.logger.Error("error on query database:" + err.Error())
 		return nil, err
 	}
 
 	var output []*entity.Order
-	var b *entity.Order
+	var b Order
 
 	for rows.Next() {
 		err := rows.Scan(
@@ -91,7 +95,9 @@ func (o *OrdersRepository) GetOrdersInPendingByUserId(ctx context.Context, userI
 		if err != nil {
 			o.logger.Error("err on unmarshal database returns for struct:" + err.Error())
 		}
+		output = append(output, b.BuildEntity())
 	}
 
+	o.logger.Info("[orders_repository] search orders pending by userid sucessfully")
 	return output, nil
 }

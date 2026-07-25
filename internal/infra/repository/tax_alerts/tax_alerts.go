@@ -1,4 +1,4 @@
-package repository
+package tax_alerts_repository
 
 import (
 	"context"

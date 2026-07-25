@@ -1,4 +1,4 @@
-package repository
+package positions_repository
 
 import (
 	"context"

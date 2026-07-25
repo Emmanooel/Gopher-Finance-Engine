@@ -1,9 +1,9 @@
 package handlers
 
 import (
-	"gopher-finance-engine/internal/application/usecases/orders"
-	"gopher-finance-engine/internal/application/usecases/positions"
-	"gopher-finance-engine/internal/application/usecases/users"
+	"gopher-finance-engine/internal/application/orders"
+	"gopher-finance-engine/internal/application/positions"
+	"gopher-finance-engine/internal/application/users"
 )
 
 type Handlers struct {

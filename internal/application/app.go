@@ -3,11 +3,14 @@ package application
 import (
 	"context"
 	"gopher-finance-engine/configs"
-	"gopher-finance-engine/internal/application/usecases/orders"
-	"gopher-finance-engine/internal/application/usecases/positions"
-	"gopher-finance-engine/internal/application/usecases/users"
+
+	"gopher-finance-engine/internal/application/orders"
+	"gopher-finance-engine/internal/application/positions"
+	"gopher-finance-engine/internal/application/users"
 	"gopher-finance-engine/internal/infra/auth"
-	"gopher-finance-engine/internal/infra/repository"
+	orders_repository "gopher-finance-engine/internal/infra/repository/orders"
+	positions_repository "gopher-finance-engine/internal/infra/repository/positions"
+	users_repository "gopher-finance-engine/internal/infra/repository/users"
 	"gopher-finance-engine/internal/infra/web/routes"
 	"gopher-finance-engine/pkg/postgres"
 
@@ -43,16 +46,16 @@ func NewApplication() *Application {
 }
 
 func newUsecases(app *Application) Usecases {
-	userRepository := repository.NewUserRepository(app.Logger)
-	positionRepository := repository.NewPositionRepository(app.Logger)
-	orderRepository := repository.NewOrdersRepository(app.Logger)
+	userRepository := users_repository.NewUserRepository(app.Logger)
+	positionRepository := positions_repository.NewPositionRepository(app.Logger)
+	orderRepository := orders_repository.NewOrdersRepository(app.Logger)
 
 	authService := auth.NewAuthService()
 
 	userUsecase := users.NewUsersUsecase(app.Logger, userRepository, authService)
 	positionUsecase := positions.NewPositionUsecase(app.Logger, positionRepository, orderRepository)
 
-	orderUsecase := orders.NewOrdersUsecase(app.Logger, orderRepository, positionUsecase)
+	orderUsecase := orders.NewOrdersUsecase(app.Logger, orderRepository)
 
 	return Usecases{
 		UserUsecase:      userUsecase,

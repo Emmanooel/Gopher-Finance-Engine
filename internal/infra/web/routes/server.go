@@ -1,9 +1,9 @@
 package routes
 
 import (
-	"gopher-finance-engine/internal/application/usecases/orders"
-	"gopher-finance-engine/internal/application/usecases/positions"
-	"gopher-finance-engine/internal/application/usecases/users"
+	"gopher-finance-engine/internal/application/orders"
+	"gopher-finance-engine/internal/application/positions"
+	"gopher-finance-engine/internal/application/users"
 	"gopher-finance-engine/internal/infra/web/routes/handlers"
 
 	"github.com/gin-gonic/gin"

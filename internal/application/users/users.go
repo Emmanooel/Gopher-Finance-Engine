@@ -2,7 +2,7 @@ package users
 
 import (
 	"context"
-	"gopher-finance-engine/internal/application/usecases"
+	"gopher-finance-engine/internal/application/utils"
 	"gopher-finance-engine/internal/domain/entity"
 	"time"
 
@@ -14,7 +14,7 @@ func (u *UsersUsecase) CreateUser(ctx context.Context, body *entity.Users) error
 	body.Id = uuid.NewString()
 	body.CreatedAt = time.Now()
 
-	pass, err := usecases.HashPassword(body.Password)
+	pass, err := utils.HashPassword(body.Password)
 	body.Password = pass
 
 	err = u.repo.CreateUser(ctx, *body)
