@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"go.uber.org/zap"
 )
 
 func (u *UsersUsecase) CreateUser(ctx context.Context, body *entity.Users) error {
@@ -20,7 +19,7 @@ func (u *UsersUsecase) CreateUser(ctx context.Context, body *entity.Users) error
 	err = u.repo.CreateUser(ctx, *body)
 
 	if err != nil {
-		u.logger.Error("CreateUser", zap.Error(err))
+		u.logger.Info("CreateUser")
 		return err
 	}
 
@@ -31,7 +30,7 @@ func (u *UsersUsecase) GetAllUsers(ctx context.Context, page int) (entity.UsersR
 	users, err := u.repo.GetAllUsers(ctx)
 
 	if err != nil {
-		u.logger.Error("GetUsers", zap.Error(err))
+		u.logger.Info("GetUsers")
 		return entity.UsersResponse{}, err
 	}
 

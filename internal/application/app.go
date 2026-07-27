@@ -6,6 +6,7 @@ import (
 
 	"gopher-finance-engine/internal/application/orders"
 	"gopher-finance-engine/internal/application/positions"
+	positions_service "gopher-finance-engine/internal/application/positions/service"
 	"gopher-finance-engine/internal/application/users"
 	"gopher-finance-engine/internal/infra/auth"
 	orders_repository "gopher-finance-engine/internal/infra/repository/orders"
@@ -54,8 +55,11 @@ func newUsecases(app *Application) Usecases {
 
 	userUsecase := users.NewUsersUsecase(app.Logger, userRepository, authService)
 	positionUsecase := positions.NewPositionUsecase(app.Logger, positionRepository, orderRepository)
+	positionService := positions_service.NewPositionService(app.Logger, positionUsecase)
 
-	orderUsecase := orders.NewOrdersUsecase(app.Logger, orderRepository)
+	orderUsecase := orders.NewOrdersUsecase(app.Logger, orderRepository, positionService)
+
+	orderUsecase.ProcessOrders(context.TODO(), "bbc4ef70-3d14-4455-8713-2562bb6f3f45")
 
 	return Usecases{
 		UserUsecase:      userUsecase,

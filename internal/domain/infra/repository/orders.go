@@ -8,4 +8,5 @@ import (
 type OrdersRepositoryI interface {
 	CreateOrders(ctx context.Context, orders *entity.Order) error
 	GetOrdersInPendingByUserId(ctx context.Context, userId string) ([]*entity.Order, error)
+	UpdateStatusOrders(ctx context.Context, order_id, status string) error
 }

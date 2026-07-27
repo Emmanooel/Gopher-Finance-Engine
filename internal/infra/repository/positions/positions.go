@@ -7,12 +7,7 @@ import (
 	"gopher-finance-engine/internal/domain/infra/repository"
 	"gopher-finance-engine/pkg/postgres"
 
-	"github.com/jackc/pgx/v5"
 	"go.uber.org/zap"
-)
-
-var (
-	ErrUserNotPosition = errors.New("user not have position activate in wallet")
 )
 
 type PositionRepository struct {
@@ -27,81 +22,119 @@ func NewPositionRepository(
 	}
 }
 
-func (p *PositionRepository) SaveNewPosition(ctx context.Context, pos *entity.Positions) error {
-	db := postgres.Db
-
-	const query = `INSERT INTO positions (id, user_id, symbol, total_amount, average_price, updated_at)
-					VALUES ($1, $2, $3, $4, $5, $6)
-
-					ON CONFLICT (user_id, symbol)
-					DO UPDATE
-					SET total_amount = positions.total_amount + EXCLUDED.total_amount,
-						average_price =
-						(
-							(positions.average_price * positions.total_amount) +
-							(EXCLUDED.average_price * EXCLUDED.total_amount)
-						)
-						/
-						NULLIF(positions.total_amount + EXCLUDED.total_amount, 0),
-						updated_at = EXCLUDED.updated_at
-	`
-
-	_, err := db.Exec(
-		ctx,
-		query,
-		pos.Id,
-		pos.UserId,
-		pos.Symbol,
-		pos.TotalAmount,
-		pos.AveragePrice,
-		pos.UpdatedAt,
-	)
-
+func (p *PositionRepository) SaveNewPosition(ctx context.Context, position *entity.Positions) error {
+	tx, err := postgres.Db.Begin(ctx)
 	if err != nil {
-		p.logger.Error("error save new position, error:" + err.Error())
+		p.logger.Error("error connect database", zap.Error(err))
 		return err
 	}
 
-	return nil
+	defer tx.Rollback(ctx)
+
+	const query = `INSERT INTO positions (id, user_id, symbol, total_amount, average_price, total_cost)
+					VALUES ($1, $2, $3, $4, $5, $6)
+	`
+
+	_, err = tx.Exec(
+		ctx,
+		query,
+		position.Id,
+		position.UserId,
+		position.Symbol,
+		position.TotalAmount,
+		position.AveragePrice,
+		position.TotalCost,
+	)
+
+	if err != nil {
+		p.logger.Error("error save new position, error:", zap.Error(err))
+		return err
+	}
+
+	return tx.Commit(ctx)
 
 }
 
-func (p *PositionRepository) GetPositionByUserId(ctx context.Context, userId string) ([]*entity.Positions, error) {
-	db := postgres.Db
-
-	if db == nil {
-		p.logger.Error("database is null")
-		return nil, errors.New("database is null")
+func (p *PositionRepository) UpdatePosition(ctx context.Context, position *entity.Positions) error {
+	tx, err := postgres.Db.Begin(ctx)
+	if err != nil {
+		p.logger.Error("error connect database", zap.Error(err))
+		return err
 	}
+
+	defer tx.Rollback(ctx)
+
+	const query = `
+	UPDATE positions
+	SET
+		total_amount = $1,
+		average_price = $2,
+		total_cost = $3
+	WHERE id = $4
+`
+
+	_, err = tx.Exec(
+		ctx,
+		query,
+		position.TotalAmount,
+		position.AveragePrice,
+		position.TotalCost,
+		position.Id,
+	)
+
+	if err != nil {
+		p.logger.Error("error save new position, error:", zap.Error(err))
+		return err
+	}
+
+	return tx.Commit(ctx)
+}
+
+func (p *PositionRepository) GetPositionByUserId(ctx context.Context, userId string) ([]*entity.Positions, error) {
+	tx, err := postgres.Db.Begin(ctx)
+	err = errors.New("na locuura")
+	if err != nil {
+		p.logger.Error("error connect database", zap.Error(err))
+		return nil, err
+	}
+
+	defer tx.Rollback(ctx)
 
 	const query = `SELECT * FROM positions
 	WHERE user_id = $1`
 
-	rows, err := db.Query(ctx, query, userId)
+	rows, err := tx.Query(ctx, query, userId)
 
-	if err == pgx.ErrNoRows {
-		p.logger.Info("user not have position")
-		return nil, ErrUserNotPosition
+	if err != nil {
+		p.logger.Info("error consult database: ", zap.Error(err))
+		return nil, err
 	}
 
 	var output []*entity.Positions
-	var pp *entity.Positions
+	var position Positions
 	for rows.Next() {
 		err = rows.Scan(
-			&pp.Id,
-			&pp.UserId,
-			&pp.Symbol,
-			&pp.TotalAmount,
-			&pp.AveragePrice,
-			pp.UpdatedAt,
+			&position.Id,
+			&position.UserId,
+			&position.Symbol,
+			&position.TotalAmount,
+			&position.AveragePrice,
+			&position.TotalCost,
+			&position.UpdatedAt,
 		)
 
 		if err != nil {
-			p.logger.Error("errors at unsmarshal return database:" + err.Error())
+			p.logger.Error("errors at unsmarshal return database:", zap.Error(err))
 			return nil, err
 		}
-		output = append(output, pp)
+		output = append(output, position.BuildEntity())
 	}
 
-	return output, nil
+	if len(output) <= 0 {
+		p.logger.Info("user not have position activate in wallet")
+		return nil, tx.Commit(ctx)
+	}
+
+	p.logger.Info("search position by userID sucessfull", zap.Any("output:", output))
+	return output, tx.Commit(ctx)
 }

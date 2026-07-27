@@ -2,9 +2,15 @@ package orders
 
 import (
 	"context"
+	"errors"
 	"gopher-finance-engine/internal/domain/entity"
 
 	"go.uber.org/zap"
+)
+
+const (
+	BUY  = "BUY"
+	SELL = "SELL"
 )
 
 //step 1: obtem todas as ordens do usuário com status PENDING ::check
@@ -24,33 +30,83 @@ func (u *OrdersUsecase) ProcessOrders(ctx context.Context, userId string) error 
 
 	pendingOrders, err := u.repo.GetOrdersInPendingByUserId(ctx, userId)
 	if err != nil {
-		u.logger.Error("error get orders in pending by userId", zap.String("userId", userId), zap.Error(err))
+		u.logger.Info("error get orders in pending by userId", zap.String("userId", userId))
 		return err
 	}
 
-	stockQuantity := u.getQuantityBySymbol(pendingOrders)
-	stockPrice := u.getPriceBySymbol(pendingOrders)
+	for _, order := range pendingOrders {
+		positions, err := u.pS.SearchPositionByUserIdAndSymbol(ctx, userId, order.Symbol)
 
-	u.logger.Info("Process orders", zap.Any("stockQuantity", stockQuantity), zap.Any("stockPrice", stockPrice))
+		if err != nil {
+			u.logger.Info("error get position by userId and symbol")
+			return err
+		}
+
+		if positions == nil {
+			u.logger.Info("symbol don't save in user wallet, iniciate save position")
+			positions, err = u.SaveNewPosition(ctx, order)
+
+			if err != nil {
+				u.logger.Info("error on update position by order")
+				return err
+			}
+		}
+
+		switch order.Side {
+		case BUY:
+			p := positions.UpdatePositionByPurchaceOrder(*order)
+			err = u.pS.UpdatePositionByOrder(ctx, order, p)
+			if err != nil {
+				u.logger.Info("error on update position by order")
+				return err
+			}
+
+			u.logger.Info("update order status for process sucessully")
+			err = u.UpdateStatusOrders(ctx, order.ID)
+
+			if err != nil {
+				u.logger.Info("error on update order status")
+				return err
+			}
+		case SELL:
+			if positions.TotalAmount < order.Amount {
+				u.logger.Error("sales quantity less than total quantity")
+				return errors.New("sales quantity less than total quantity")
+			}
+			p := positions.UpdatePositionBySellOrder(*order)
+			err = u.pS.UpdatePositionByOrder(ctx, order, p)
+
+			if err != nil {
+				u.logger.Info("error on update position by order")
+				return err
+			}
+
+			u.logger.Info("update order status for process sucessully")
+
+			err = u.UpdateStatusOrders(ctx, order.ID)
+
+			if err != nil {
+				u.logger.Info("error on update order status")
+				return err
+			}
+
+		default:
+			return errors.New("unsupported action")
+		}
+	}
+
+	u.logger.Info("Process all orders completed")
 
 	return nil
 }
 
-func (u *OrdersUsecase) getQuantityBySymbol(orders []*entity.Order) map[string]int64 {
-	quantityBySymbol := make(map[string]int64)
-	for _, order := range orders {
-		quantityBySymbol[order.Symbol] += order.Amount
+func (u *OrdersUsecase) SaveNewPosition(ctx context.Context, order *entity.Order) (*entity.Positions, error) {
+	positions, err := u.pS.SaveNewPositionByOrder(ctx, order)
+
+	if err != nil {
+		u.logger.Info("error save new position")
+		return nil, err
 	}
 
-	u.logger.Info("Quantity by symbol", zap.Any("quantityBySymbol", quantityBySymbol))
-	return quantityBySymbol
-}
-
-func (u *OrdersUsecase) getPriceBySymbol(orders []*entity.Order) map[string]int64 {
-	priceBySymbol := make(map[string]int64)
-	for _, order := range orders {
-		priceBySymbol[order.Symbol] += order.Price
-	}
-	u.logger.Info("Price by symbol", zap.Any("priceBySymbol", priceBySymbol))
-	return priceBySymbol
+	return positions, nil
 }

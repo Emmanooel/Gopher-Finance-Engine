@@ -26,6 +26,32 @@ func (p *Positions) BuildPositionByOrder(o Order) {
 	p.Symbol = o.Symbol
 	p.TotalCost = o.Price * o.Amount
 	p.TotalAmount = o.Amount
-	p.AveragePrice = (o.Price * o.Amount) / o.Amount
-	p.UpdatedAt = time.Now()
+	p.AveragePrice = p.TotalCost / p.TotalAmount
+}
+
+func (p *Positions) UpdatePositionByPurchaceOrder(o Order) *Positions {
+	totalCost := p.TotalCost + (o.Amount * o.Price)
+	totalAmount := p.TotalAmount + o.Amount
+	averagePrice := totalCost / totalAmount
+	return &Positions{
+		Id:           p.Id,
+		UserId:       p.UserId,
+		Symbol:       p.Symbol,
+		TotalCost:    totalCost,
+		TotalAmount:  totalAmount,
+		AveragePrice: averagePrice,
+	}
+}
+
+func (p *Positions) UpdatePositionBySellOrder(o Order) *Positions {
+	totalCost := p.TotalCost - (p.AveragePrice * o.Amount)
+	totalAmount := p.TotalAmount - o.Amount
+	return &Positions{
+		Id:           p.Id,
+		UserId:       p.UserId,
+		Symbol:       p.Symbol,
+		TotalCost:    totalCost,
+		TotalAmount:  totalAmount,
+		AveragePrice: p.AveragePrice,
+	}
 }

@@ -16,6 +16,7 @@ type Order struct {
 	Side      string
 	Status    string
 	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 func (o *Order) BuildEntity() *entity.Order {
@@ -28,5 +29,6 @@ func (o *Order) BuildEntity() *entity.Order {
 		Side:      o.Side,
 		Status:    o.Status,
 		CreatedAt: o.CreatedAt,
+		UpdatedAt: o.UpdatedAt,
 	}
 }

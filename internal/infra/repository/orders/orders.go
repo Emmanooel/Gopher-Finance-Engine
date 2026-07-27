@@ -48,24 +48,26 @@ func (o *OrdersRepository) CreateOrders(ctx context.Context, order *entity.Order
 	)
 
 	if err != nil {
-		return errors.New("error create order, error:" + err.Error())
+		o.logger.Error("error create order", zap.Error(err))
+		return errors.New("error create order")
 	}
 
 	return nil
 }
 
 func (o *OrdersRepository) GetOrdersInPendingByUserId(ctx context.Context, userId string) ([]*entity.Order, error) {
-	db := postgres.Db
-
-	if db == nil {
-		o.logger.Error("conn database is null")
-		return nil, errors.New("conn database is null")
+	tx, err := postgres.Db.Begin(ctx)
+	if err != nil {
+		o.logger.Error("error connect database", zap.Error(err))
+		return nil, err
 	}
+
+	defer tx.Rollback(ctx)
 
 	const query = `SELECT * FROM orders
 		WHERE user_id = $1 AND status = 'PENDING'
 	`
-	rows, err := db.Query(ctx, query, userId)
+	rows, err := tx.Query(ctx, query, userId)
 
 	if err != nil {
 		if err == pgx.ErrNoRows {
@@ -73,7 +75,7 @@ func (o *OrdersRepository) GetOrdersInPendingByUserId(ctx context.Context, userI
 			return nil, err
 		}
 
-		o.logger.Error("error on query database:" + err.Error())
+		o.logger.Error("error on query database:", zap.Error(err))
 		return nil, err
 	}
 
@@ -90,14 +92,46 @@ func (o *OrdersRepository) GetOrdersInPendingByUserId(ctx context.Context, userI
 			&b.Side,
 			&b.Status,
 			&b.CreatedAt,
+			&b.UpdatedAt,
 		)
 
 		if err != nil {
-			o.logger.Error("err on unmarshal database returns for struct:" + err.Error())
+			o.logger.Error("err on unmarshal database returns for struct: ", zap.Error(err))
 		}
 		output = append(output, b.BuildEntity())
 	}
 
 	o.logger.Info("[orders_repository] search orders pending by userid sucessfully")
-	return output, nil
+	return output, tx.Commit(ctx)
+}
+
+func (o *OrdersRepository) UpdateStatusOrders(ctx context.Context, order_id, status string) error {
+	tx, err := postgres.Db.Begin(ctx)
+	if err != nil {
+		o.logger.Error("error connect database", zap.Error(err))
+		return err
+	}
+
+	defer tx.Rollback(ctx)
+
+	const query = `
+	UPDATE orders
+	SET
+		status = $1
+	WHERE id = $2
+`
+
+	_, err = tx.Exec(
+		ctx,
+		query,
+		status,
+		order_id,
+	)
+
+	if err != nil {
+		o.logger.Error("error update order status, error:", zap.Error(err))
+		return err
+	}
+
+	return tx.Commit(ctx)
 }
