@@ -21,3 +21,17 @@ func (s *Handlers) CreateOrders(c *gin.Context) {
 
 	c.JSON(202, "success")
 }
+
+func (s *Handlers) ShowOrdersHistory(c *gin.Context) {
+	ctx := c.Request.Context()
+
+	userId := c.GetString("user_id")
+
+	orders, err := s.OrderUsecase.GetAllOrdersByUserId(ctx, userId)
+
+	if err != nil {
+		c.JSON(500, err.Error())
+	}
+
+	c.JSON(200, orders)
+}

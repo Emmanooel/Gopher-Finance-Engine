@@ -43,3 +43,17 @@ func (u *OrdersUsecase) UpdateStatusOrders(ctx context.Context, order_id string)
 	u.logger.Info("update status order sucessfully", zap.Any("order_status: ", status))
 	return nil
 }
+
+func (u *OrdersUsecase) GetAllOrdersByUserId(ctx context.Context, userId string) (*entity.OrderResponse, error) {
+	u.logger.Info("getting all orders by userId")
+	orders, err := u.repo.GetAllOrdersByUserId(ctx, userId)
+
+	if err != nil {
+		u.logger.Info("error get all orders by userId")
+		return nil, err
+	}
+
+	return &entity.OrderResponse{
+		Data: orders,
+	}, nil
+}

@@ -1,4 +1,4 @@
-# PR 012 - Disponibilização da carteira do usuário autenticado
+# PR 011 - Disponibilização da carteira do usuário autenticado
 
 **Status:** Merged
 

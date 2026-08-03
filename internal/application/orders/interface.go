@@ -12,6 +12,7 @@ import (
 type OrdersUsecaseI interface {
 	CreateOrders(ctx context.Context, body *entity.Order) error
 	ProcessPendingOrders(ctx context.Context) error
+	GetAllOrdersByUserId(ctx context.Context, userId string) (*entity.OrderResponse, error)
 }
 
 type OrdersUsecase struct {

@@ -26,6 +26,7 @@ func Routes(router *gin.Engine, h handlers.Handlers, tokenService auth.TokenServ
 	{
 		appsAuth.POST("/orders", h.CreateOrders)
 		appsAuth.GET("/portfolio", middleware.AuthMiddleware(tokenService), h.GetPositionByUserId)
+		appsAuth.GET("/historico", middleware.AuthMiddleware(tokenService), h.ShowOrdersHistory)
 	}
 	return router
 }

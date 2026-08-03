@@ -15,3 +15,8 @@ type Order struct {
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at`
 }
+
+type OrderResponse struct {
+	Data []*Order `json:"data"`
+	Meta Meta     `json:"meta"`
+}

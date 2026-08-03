@@ -136,3 +136,43 @@ func (o *OrdersRepository) UpdateStatusOrders(ctx context.Context, order_id, sta
 
 	return tx.Commit(ctx)
 }
+
+func (o *OrdersRepository) GetAllOrdersByUserId(ctx context.Context, userId string) ([]*entity.Order, error) {
+	tx, err := postgres.Db.Begin(ctx)
+	if err != nil {
+		o.logger.Error("error connect database", zap.Error(err))
+		return nil, err
+	}
+
+	defer tx.Rollback(ctx)
+
+	const query = `SELECT * FROM orders
+	WHERE user_id = $1
+	`
+	rows, err := tx.Query(ctx, query, userId)
+	if err != nil {
+		o.logger.Error("error on query database:", zap.Error(err))
+		return nil, err
+	}
+
+	var output []*entity.Order
+	var b Order
+	for rows.Next() {
+		err := rows.Scan(
+			&b.ID,
+			&b.UserId,
+			&b.Symbol,
+			&b.Amount,
+			&b.Price,
+			&b.Side,
+			&b.Status,
+			&b.CreatedAt,
+			&b.UpdatedAt,
+		)
+		if err != nil {
+			o.logger.Error("err on unmarshal database returns for struct: ", zap.Error(err))
+		}
+		output = append(output, b.BuildEntity())
+	}
+	return output, tx.Commit(ctx)
+}

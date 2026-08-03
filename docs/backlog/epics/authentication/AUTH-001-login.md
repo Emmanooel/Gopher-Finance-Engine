@@ -8,11 +8,11 @@ Permitir que um usuário autenticado obtenha um token JWT para acessar os recurs
 
 ## Critérios de aceite
 
-- [ ] Receber e-mail e senha.
-- [ ] Validar se o usuário existe.
-- [ ] Validar a senha informada.
-- [ ] Gerar um JWT válido.
-- [ ] Retornar o token para o cliente.
+- [x] Receber e-mail e senha.
+- [x] Validar se o usuário existe.
+- [x] Validar a senha informada.
+- [x] Gerar um JWT válido.
+- [x] Retornar o token para o cliente.
 
 ---
 
