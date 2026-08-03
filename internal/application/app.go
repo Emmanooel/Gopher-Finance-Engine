@@ -4,6 +4,7 @@ import (
 	"context"
 	"gopher-finance-engine/configs"
 
+	"gopher-finance-engine/internal/application/engine"
 	"gopher-finance-engine/internal/application/orders"
 	"gopher-finance-engine/internal/application/positions"
 	positions_service "gopher-finance-engine/internal/application/positions/service"
@@ -23,12 +24,19 @@ type Application struct {
 	Routes      *routes.Server
 	authService auth.TokenService
 	usecases    Usecases
+	Worker      engine.WorkerI
 }
 
 type Usecases struct {
 	UserUsecase      users.UserUsecasesI
 	PositionsUsecase positions.PositionUsecasesI
 	OrderUsecase     orders.OrdersUsecaseI
+}
+
+type Worker struct {
+	Logger       *zap.Logger
+	OrderUsecase orders.OrdersUsecaseI
+	Worker       engine.WorkerI
 }
 
 func NewApplication() *Application {
@@ -67,6 +75,27 @@ func newUsecases(app *Application) Usecases {
 		UserUsecase:      userUsecase,
 		PositionsUsecase: positionUsecase,
 		OrderUsecase:     orderUsecase,
+	}
+}
+
+func NewWorker() Worker {
+	var app Application
+
+	postgres.NewPostgresConn(context.Background(), configs.DbConn)
+
+	app.Logger = initializeLogger()
+
+	app.usecases = newUsecases(&app)
+
+	work := engine.NewWorker(
+		app.Logger,
+		app.usecases.OrderUsecase,
+	)
+
+	return Worker{
+		Logger:       app.Logger,
+		OrderUsecase: app.usecases.OrderUsecase,
+		Worker:       work,
 	}
 }
 

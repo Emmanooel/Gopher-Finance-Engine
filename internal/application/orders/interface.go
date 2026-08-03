@@ -11,8 +11,7 @@ import (
 
 type OrdersUsecaseI interface {
 	CreateOrders(ctx context.Context, body *entity.Order) error
-	ProcessOrders(ctx context.Context, userId string) error
-	UpdateStatusOrders(ctx context.Context, order_id string) error
+	ProcessPendingOrders(ctx context.Context) error
 }
 
 type OrdersUsecase struct {

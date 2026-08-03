@@ -55,7 +55,7 @@ func (o *OrdersRepository) CreateOrders(ctx context.Context, order *entity.Order
 	return nil
 }
 
-func (o *OrdersRepository) GetOrdersInPendingByUserId(ctx context.Context, userId string) ([]*entity.Order, error) {
+func (o *OrdersRepository) GetAllOrdersInPending(ctx context.Context, limit int) ([]*entity.Order, error) {
 	tx, err := postgres.Db.Begin(ctx)
 	if err != nil {
 		o.logger.Error("error connect database", zap.Error(err))
@@ -65,9 +65,10 @@ func (o *OrdersRepository) GetOrdersInPendingByUserId(ctx context.Context, userI
 	defer tx.Rollback(ctx)
 
 	const query = `SELECT * FROM orders
-		WHERE user_id = $1 AND status = 'PENDING'
+		WHERE status = 'PENDING'
+		LIMIT $1
 	`
-	rows, err := tx.Query(ctx, query, userId)
+	rows, err := tx.Query(ctx, query, limit)
 
 	if err != nil {
 		if err == pgx.ErrNoRows {
