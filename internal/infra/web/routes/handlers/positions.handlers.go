@@ -4,7 +4,12 @@ import "github.com/gin-gonic/gin"
 
 func (s *Handlers) GetPositionByUserId(c *gin.Context) {
 	ctx := c.Request.Context()
-	id := c.Param("id")
+	id := c.GetString("user_id")
+
+	if id == "" {
+		c.JSON(400, gin.H{"error": "user_id is required"})
+		return
+	}
 
 	response, err := s.PositionUsecase.GetPositionByUserId(ctx, id)
 

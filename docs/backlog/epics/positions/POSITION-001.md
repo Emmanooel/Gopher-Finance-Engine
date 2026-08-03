@@ -8,13 +8,14 @@ Permitir que o usuário visualize sua carteira consolidada.
 
 ## Critérios de aceite
 
-- [ ] Listar ativos do usuário.
-- [ ] Informar quantidade.
-- [ ] Informar preço médio.
-- [ ] Informar posição consolidada.
+- [x] Usuário autenticado.
+- [x] Listar ativos do usuário.
+- [x] Informar quantidade.
+- [x] Informar preço médio.
+- [x] Informar posição consolidada.
 
 ---
 
 ## Status
 
-Backlog
+Done

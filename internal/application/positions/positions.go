@@ -20,7 +20,6 @@ func (p *PositionUsecase) SavePositionByNewOrder(ctx context.Context, order *ent
 }
 
 func (p *PositionUsecase) GetPositionByUserId(ctx context.Context, id string) (*entity.ResponsePositions, error) {
-	var output *entity.ResponsePositions
 	position, err := p.PositionRepo.GetPositionByUserId(ctx, id)
 
 	if err != nil {
@@ -28,7 +27,7 @@ func (p *PositionUsecase) GetPositionByUserId(ctx context.Context, id string) (*
 		return nil, err
 	}
 
-	output.Positions = position
+	output := &entity.ResponsePositions{Positions: position}
 
 	return output, nil
 }
@@ -50,20 +49,6 @@ func (p *PositionUsecase) SearchPositionByUserIdAndSymbol(ctx context.Context, u
 	}
 
 	return nil, nil
-}
-
-func (p *PositionUsecase) ListAllPositionByUserId(ctx context.Context, id string) (*entity.ResponsePositions, error) {
-	var output *entity.ResponsePositions
-	position, err := p.PositionRepo.GetPositionByUserId(ctx, id)
-
-	if err != nil {
-		p.Logger.Info("error list positions")
-		return nil, err
-	}
-
-	output.Positions = position
-
-	return output, nil
 }
 
 func (p *PositionUsecase) UpdateUserPosition(ctx context.Context, position *entity.Positions) error {

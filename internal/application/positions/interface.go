@@ -12,7 +12,6 @@ type PositionUsecasesI interface {
 	SavePositionByNewOrder(ctx context.Context, order *entity.Order) (*entity.Positions, error)
 	GetPositionByUserId(ctx context.Context, id string) (*entity.ResponsePositions, error)
 	SearchPositionByUserIdAndSymbol(ctx context.Context, userId, symbol string) (*entity.Positions, error)
-	ListAllPositionByUserId(ctx context.Context, id string) (*entity.ResponsePositions, error)
 	UpdateUserPosition(ctx context.Context, position *entity.Positions) error
 	DeletePositionByUserId(ctx context.Context, userId string) error
 }

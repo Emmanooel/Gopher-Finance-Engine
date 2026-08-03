@@ -11,7 +11,7 @@ Processar ordens pendentes e atualizar automaticamente a posição consolidada d
 - [x] Buscar ordens pendentes.
 - [x] Processar cada ordem.
 - [x] Calcular o preço médio.
-- [ ] Atualizar a posição do usuário.
+- [x] Atualizar a posição do usuário.
 - [x] Alterar o status da ordem após o processamento.
 
 ---
@@ -25,4 +25,4 @@ Processar ordens pendentes e atualizar automaticamente a posição consolidada d
 
 ## Status
 
-In Progress
+Done

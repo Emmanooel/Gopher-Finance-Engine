@@ -63,8 +63,6 @@ func newUsecases(app *Application) Usecases {
 
 	orderUsecase := orders.NewOrdersUsecase(app.Logger, orderRepository, positionService)
 
-	orderUsecase.ProcessOrders(context.TODO(), "bbc4ef70-3d14-4455-8713-2562bb6f3f45")
-
 	return Usecases{
 		UserUsecase:      userUsecase,
 		PositionsUsecase: positionUsecase,
