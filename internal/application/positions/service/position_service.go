@@ -57,7 +57,7 @@ func (p *PositionService) SearchPositionByUserIdAndSymbol(ctx context.Context, u
 
 func (p *PositionService) UpdatePositionByOrder(ctx context.Context, order *entity.Order, position *entity.Positions) error {
 	p.logger.Info("iniciate update position")
-	err := p.PU.UpdatePositionByUserIdAndSymbol(ctx, order.UserId, order.Symbol, position)
+	err := p.PU.UpdateUserPosition(ctx, position)
 
 	if err != nil {
 		p.logger.Info("error on update position")

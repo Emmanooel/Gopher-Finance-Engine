@@ -66,7 +66,15 @@ func (p *PositionUsecase) ListAllPositionByUserId(ctx context.Context, id string
 	return output, nil
 }
 
-func (p *PositionUsecase) UpdatePositionByUserIdAndSymbol(ctx context.Context, userId string, symbol string, position *entity.Positions) error {
+func (p *PositionUsecase) UpdateUserPosition(ctx context.Context, position *entity.Positions) error {
+	p.Logger.Info("iniciate update position")
+	err := p.PositionRepo.UpdatePosition(ctx, position)
+
+	if err != nil {
+		p.Logger.Info("error on update position")
+		return err
+	}
+
 	return nil
 }
 

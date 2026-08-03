@@ -13,7 +13,7 @@ type PositionUsecasesI interface {
 	GetPositionByUserId(ctx context.Context, id string) (*entity.ResponsePositions, error)
 	SearchPositionByUserIdAndSymbol(ctx context.Context, userId, symbol string) (*entity.Positions, error)
 	ListAllPositionByUserId(ctx context.Context, id string) (*entity.ResponsePositions, error)
-	UpdatePositionByUserIdAndSymbol(ctx context.Context, userId string, symbol string, position *entity.Positions) error
+	UpdateUserPosition(ctx context.Context, position *entity.Positions) error
 	DeletePositionByUserId(ctx context.Context, userId string) error
 }
 type PositionUsecase struct {

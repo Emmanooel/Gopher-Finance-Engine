@@ -2,7 +2,6 @@ package positions_repository
 
 import (
 	"context"
-	"errors"
 	"gopher-finance-engine/internal/domain/entity"
 	"gopher-finance-engine/internal/domain/infra/repository"
 	"gopher-finance-engine/pkg/postgres"
@@ -92,7 +91,7 @@ func (p *PositionRepository) UpdatePosition(ctx context.Context, position *entit
 
 func (p *PositionRepository) GetPositionByUserId(ctx context.Context, userId string) ([]*entity.Positions, error) {
 	tx, err := postgres.Db.Begin(ctx)
-	err = errors.New("na locuura")
+
 	if err != nil {
 		p.logger.Error("error connect database", zap.Error(err))
 		return nil, err
