@@ -8,11 +8,11 @@ Processar ordens pendentes e atualizar automaticamente a posição consolidada d
 
 ## Critérios de aceite
 
-- [ ] Buscar ordens pendentes.
-- [ ] Processar cada ordem.
-- [ ] Calcular o preço médio.
+- [x] Buscar ordens pendentes.
+- [x] Processar cada ordem.
+- [x] Calcular o preço médio.
 - [ ] Atualizar a posição do usuário.
-- [ ] Alterar o status da ordem após o processamento.
+- [x] Alterar o status da ordem após o processamento.
 
 ---
 

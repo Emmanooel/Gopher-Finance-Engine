@@ -13,6 +13,7 @@ type UserUsecasesI interface {
 	CreateUser(ctx context.Context, body *entity.Users) error
 	Login(ctx context.Context, body entity.UserLogin) (string, error)
 	GetAllUsers(ctx context.Context, page int) (entity.UsersResponse, error)
+	GetUserById(ctx context.Context, id string) (*entity.User, error)
 }
 
 type UsersUsecase struct {

@@ -16,7 +16,7 @@ func (u *UsersUsecase) Login(ctx context.Context, body entity.UserLogin) (string
 		return "", err
 	}
 
-	match := utils.CheckPasswordHash(body.Password, user.Password)
+	match := utils.CheckPasswordHash(body.Password, *user.Password)
 
 	if !match {
 		return "", err

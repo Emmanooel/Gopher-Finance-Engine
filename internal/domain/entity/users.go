@@ -3,12 +3,20 @@ package entity
 import "time"
 
 type Users struct {
-	Id        string    `json:"id"`
-	Name      string    `json:"name" binding:"required"`
-	Email     string    `json:"email" binding:"required"`
-	Password  string    `json:"password" binding:"required,min=8"`
-	Role      string    `json:"rule"`
-	CreatedAt time.Time `json:"created_at"`
+	Id        string     `json:"id"`
+	Name      string     `json:"name" binding:"required"`
+	Email     string     `json:"email" binding:"required"`
+	Password  *string    `json:"password" binding:"required,min=8"`
+	Rule      string     `json:"rule"`
+	CreatedAt time.Time  `json:"created_at"`
+	DeletedAt *time.Time `json:"deleted_at"`
+}
+
+type User struct {
+	Id    string `json:"id"`
+	Name  string `json:"name" binding:"required"`
+	Email string `json:"email" binding:"required"`
+	Rule  string `json:"rule"`
 }
 
 type Meta struct {
@@ -28,4 +36,13 @@ type UsersResponse struct {
 type UserLogin struct {
 	Email    string `json:"email"binding:"required,email"`
 	Password string `json:"password"binding:"required,min=8"`
+}
+
+func (u *Users) BuildUser() *User {
+	return &User{
+		Id:    u.Id,
+		Name:  u.Name,
+		Email: u.Email,
+		Rule:  u.Rule,
+	}
 }

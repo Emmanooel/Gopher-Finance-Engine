@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
 func (s *Handlers) CreateUser(c *gin.Context) {
@@ -67,4 +68,24 @@ func (s *Handlers) GetUsers(c *gin.Context) {
 
 	c.JSON(200, response)
 
+}
+
+func (s *Handlers) GetUserById(c *gin.Context) {
+	ctx := c.Request.Context()
+	id := c.GetString("user_id")
+
+	s.logger.Info("GetUserById", zap.String("user_id", id))
+
+	if id == "" {
+		c.JSON(400, gin.H{"error": "user_id is required"})
+		return
+	}
+
+	response, err := s.UserUsecase.GetUserById(ctx, id)
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(200, response)
 }

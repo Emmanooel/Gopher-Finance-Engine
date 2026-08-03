@@ -8,11 +8,11 @@ Permitir o cadastro de novos usuários.
 
 ## Critérios de aceite
 
-- [ ] Informar nome.
-- [ ] Informar e-mail.
-- [ ] Informar senha.
-- [ ] Persistir usuário.
-- [ ] Não permitir e-mails duplicados.
+- [x] Informar nome.
+- [x] Informar e-mail.
+- [x] Informar senha.
+- [x] Persistir usuário.
+- [x] Não permitir e-mails duplicados.
 
 ---
 

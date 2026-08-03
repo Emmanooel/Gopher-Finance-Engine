@@ -8,15 +8,15 @@ Permitir que um usuário registre uma ordem de compra ou venda.
 
 ## Critérios de aceite
 
-- [ ] Informar ativo.
-- [ ] Informar quantidade.
-- [ ] Informar preço.
-- [ ] Informar tipo da ordem.
-- [ ] Associar a ordem ao usuário.
-- [ ] Criar a ordem com status PENDING.
+- [x] Informar ativo.
+- [x] Informar quantidade.
+- [x] Informar preço.
+- [x] Informar tipo da ordem.
+- [x] Associar a ordem ao usuário.
+- [x] Criar a ordem com status PENDING.
 
 ---
 
 ## Status
 
-Backlog
+Done

@@ -13,8 +13,8 @@ func (u *UsersUsecase) CreateUser(ctx context.Context, body *entity.Users) error
 	body.Id = uuid.NewString()
 	body.CreatedAt = time.Now()
 
-	pass, err := utils.HashPassword(body.Password)
-	body.Password = pass
+	pass, err := utils.HashPassword(*body.Password)
+	body.Password = &pass
 
 	err = u.repo.CreateUser(ctx, *body)
 
@@ -35,4 +35,15 @@ func (u *UsersUsecase) GetAllUsers(ctx context.Context, page int) (entity.UsersR
 	}
 
 	return entity.UsersResponse{Data: users}, nil
+}
+
+func (u *UsersUsecase) GetUserById(ctx context.Context, id string) (*entity.User, error) {
+	user, err := u.repo.GetUserById(ctx, id)
+
+	if err != nil {
+		u.logger.Info("[GetUserById] error get user by id")
+		return nil, err
+	}
+
+	return user, nil
 }

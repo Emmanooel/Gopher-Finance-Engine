@@ -34,7 +34,7 @@ func (u *UserRepository) CreateUser(ctx context.Context, body entity.Users) erro
 		body.Name,
 		body.Email,
 		body.Password,
-		body.Role,
+		body.Rule,
 		body.CreatedAt,
 	)
 
@@ -61,7 +61,7 @@ func (u *UserRepository) FindByEmail(ctx context.Context, email string) (*entity
 		&us.Name,
 		&us.Email,
 		&us.Password,
-		&us.Role,
+		&us.Rule,
 		&us.CreatedAt,
 	)
 
@@ -96,7 +96,7 @@ func (u *UserRepository) GetAllUsers(ctx context.Context) ([]*entity.Users, erro
 			&user.Name,
 			&user.Email,
 			&user.Password,
-			&user.Role,
+			&user.Rule,
 			&user.CreatedAt,
 		)
 		if err != nil {
@@ -107,4 +107,30 @@ func (u *UserRepository) GetAllUsers(ctx context.Context) ([]*entity.Users, erro
 	}
 
 	return users, nil
+}
+
+func (u *UserRepository) GetUserById(ctx context.Context, id string) (*entity.User, error) {
+	const query = `
+		SELECT * FROM users WHERE id = $1
+	`
+	resp := postgres.Db.QueryRow(ctx, query, id)
+
+	var us entity.Users
+
+	err := resp.Scan(
+		&us.Id,
+		&us.Name,
+		&us.Email,
+		&us.Password,
+		&us.Rule,
+		&us.CreatedAt,
+		&us.DeletedAt,
+	)
+
+	if err != nil {
+		u.logger.Error("error on find user by id", zap.Error(err))
+		return nil, err
+	}
+
+	return us.BuildUser(), nil
 }

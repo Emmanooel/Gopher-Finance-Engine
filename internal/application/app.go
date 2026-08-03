@@ -19,9 +19,10 @@ import (
 )
 
 type Application struct {
-	Logger   *zap.Logger
-	Routes   *routes.Server
-	usecases Usecases
+	Logger      *zap.Logger
+	Routes      *routes.Server
+	authService auth.TokenService
+	usecases    Usecases
 }
 
 type Usecases struct {
@@ -37,10 +38,15 @@ func NewApplication() *Application {
 
 	app.Logger = initializeLogger()
 	app.usecases = newUsecases(&app)
+
+	app.authService = auth.NewAuthService()
+
 	app.Routes = routes.NewServer(
+		app.Logger,
 		app.usecases.UserUsecase,
 		app.usecases.PositionsUsecase,
 		app.usecases.OrderUsecase,
+		app.authService,
 	)
 
 	return &app
@@ -51,9 +57,7 @@ func newUsecases(app *Application) Usecases {
 	positionRepository := positions_repository.NewPositionRepository(app.Logger)
 	orderRepository := orders_repository.NewOrdersRepository(app.Logger)
 
-	authService := auth.NewAuthService()
-
-	userUsecase := users.NewUsersUsecase(app.Logger, userRepository, authService)
+	userUsecase := users.NewUsersUsecase(app.Logger, userRepository, app.authService)
 	positionUsecase := positions.NewPositionUsecase(app.Logger, positionRepository, orderRepository)
 	positionService := positions_service.NewPositionService(app.Logger, positionUsecase)
 
