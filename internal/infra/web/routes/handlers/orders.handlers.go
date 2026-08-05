@@ -14,6 +14,7 @@ func (s *Handlers) CreateOrders(c *gin.Context) {
 		c.JSON(400, err.Error())
 	}
 
+	body.UserId = c.GetString("user_id")
 	err := s.OrderUsecase.CreateOrders(ctx, body)
 	if err != nil {
 		c.JSON(500, err.Error())

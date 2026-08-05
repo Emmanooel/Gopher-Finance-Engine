@@ -2,8 +2,8 @@ package users
 
 import (
 	"context"
-	"gopher-finance-engine/internal/application/utils"
 	"gopher-finance-engine/internal/domain/entity"
+	"gopher-finance-engine/internal/utils"
 
 	"go.uber.org/zap"
 )
@@ -22,6 +22,7 @@ func (u *UsersUsecase) Login(ctx context.Context, body entity.UserLogin) (string
 		return "", err
 	}
 
+	u.logger.Info("login", zap.Any("user_id", user.Id), zap.Any("auth", u.auth))
 	token, err := u.auth.GenToken(user.Id)
 
 	if err != nil {

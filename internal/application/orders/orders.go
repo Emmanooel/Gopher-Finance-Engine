@@ -18,6 +18,7 @@ func (u *OrdersUsecase) CreateOrders(ctx context.Context, body *entity.Order) er
 	body.ID = uuid.NewString()
 	body.Status = PENDING_STATUS
 
+	u.logger.Info("uuid", zap.String("user_id", body.UserId))
 	err := u.repo.CreateOrders(ctx, body)
 
 	if err != nil {

@@ -24,7 +24,7 @@ func Routes(router *gin.Engine, h handlers.Handlers, tokenService auth.TokenServ
 
 	appsAuth := router.Group("/v1")
 	{
-		appsAuth.POST("/orders", h.CreateOrders)
+		appsAuth.POST("/orders", middleware.AuthMiddleware(tokenService), h.CreateOrders)
 		appsAuth.GET("/portfolio", middleware.AuthMiddleware(tokenService), h.GetPositionByUserId)
 		appsAuth.GET("/historico", middleware.AuthMiddleware(tokenService), h.ShowOrdersHistory)
 	}

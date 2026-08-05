@@ -45,9 +45,8 @@ func NewApplication() *Application {
 	postgres.NewPostgresConn(context.Background(), configs.DbConn)
 
 	app.Logger = initializeLogger()
-	app.usecases = newUsecases(&app)
-
 	app.authService = auth.NewAuthService()
+	app.usecases = newUsecases(&app)
 
 	app.Routes = routes.NewServer(
 		app.Logger,

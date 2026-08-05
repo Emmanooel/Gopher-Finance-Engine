@@ -2,8 +2,8 @@ package users
 
 import (
 	"context"
-	"gopher-finance-engine/internal/application/utils"
 	"gopher-finance-engine/internal/domain/entity"
+	"gopher-finance-engine/internal/utils"
 	"time"
 
 	"github.com/google/uuid"
