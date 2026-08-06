@@ -31,20 +31,6 @@ func (u *OrdersUsecase) CreateOrders(ctx context.Context, body *entity.Order) er
 	return nil
 }
 
-func (u *OrdersUsecase) UpdateStatusOrders(ctx context.Context, order_id string) error {
-	u.logger.Info("updating status order")
-	status := PROCESSED_STATUS
-
-	err := u.repo.UpdateStatusOrders(ctx, order_id, status)
-
-	if err != nil {
-		return err
-	}
-
-	u.logger.Info("update status order sucessfully", zap.Any("order_status: ", status))
-	return nil
-}
-
 func (u *OrdersUsecase) GetAllOrdersByUserId(ctx context.Context, userId string) (*entity.OrderResponse, error) {
 	u.logger.Info("getting all orders by userId")
 	orders, err := u.repo.GetAllOrdersByUserId(ctx, userId)

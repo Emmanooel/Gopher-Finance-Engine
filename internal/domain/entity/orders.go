@@ -4,6 +4,11 @@ import (
 	"time"
 )
 
+const (
+	BUY  = "BUY"
+	SELL = "SELL"
+)
+
 type Order struct {
 	ID        string    `json:"id"`
 	UserId    string    `json:"user_id"`
